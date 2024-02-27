@@ -12,7 +12,8 @@ from cleaning.data_cleaning import (fix_datetime_column,
                                     split_ratings,
                                     reformat_city_column,
                                     reformat_sentiment_col,
-                                    filter_columns)
+                                    filter_columns,
+                                    compute_sentiment_col)
 
 location_name_to_city = {
     # Mapper of some common locations with their cities
@@ -76,3 +77,7 @@ if __name__ == "__main__":
     # Formatting and filtering the columns
     formatted_rating_data = reformat_sentiment_col(fixed_cities_rating_data)
     filter_rating_data = filter_columns(formatted_rating_data)
+    
+    # computing sentiments
+    correct_sentiment_data = compute_sentiment_col(filter_rating_data)
+    main_rating_data = correct_sentiment_data.drop("raw_rating", axis=1)
