@@ -301,3 +301,41 @@ def filter_columns(rating_df: pd.core.frame.DataFrame,
     filtered_dataset = rating_df[column_list]
     return filtered_dataset
 
+def compute_sentiment(rating: int) -> str:
+    """
+    Based on the rased it returns if the sentiment
+    of the reviewer is postive, negative or neutral
+
+    Args:
+        rating (int): Rating of the reviews in scale of 0 to 100
+
+    Returns:
+        str: sentiment of the reviewer
+    """
+    if rating>60:
+        sentiment = "positive"
+        return sentiment
+    elif rating<40:
+        sentiment = "negative"
+        return sentiment
+    else:
+        sentiment = "neutral"
+        return sentiment
+
+def compute_sentiment_col(rating_df: pd.core.frame.DataFrame,
+                        col_name: str= "sentiment") -> pd.core.frame.DataFrame:
+    """
+    _summary_
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): dataframe of the ratings
+        col_name (str, optional): name of the sentiment columns.
+                                    Defaults to "sentiment".
+
+    Returns:
+        pd.core.frame.DataFrame: df with the sentiments
+    """
+    # We used the normalized rating not the raw one since
+    # not all reviews have the same scale
+    rating_df[col_name] = rating_df["normalized_rating"].apply(lambda x: compute_sentiment(x))
+    return rating_df
