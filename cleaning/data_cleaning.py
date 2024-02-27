@@ -263,3 +263,41 @@ def fix_incorrect_cities(rating_df: pd.core.frame.DataFrame,
         else:
             continue
     return rating_df
+
+def reformat_sentiment_col(rating_df: pd.core.frame.DataFrame,
+                            col_name: str = "sentiment") -> pd.core.frame.DataFrame:
+    """
+    reformats the sentiment column
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): df to be reformatted
+        col_name (str, optional): name of the sentiment column.
+                                    Defaults to "sentiment".
+
+    Returns:
+        pd.core.frame.DataFrame: formatted df
+    """
+    rating_df[col_name] = [""]*len(rating_df)
+    return rating_df
+
+def filter_columns(rating_df: pd.core.frame.DataFrame,
+                    column_list: List[str] = ["id", "content", "date",
+                                            "language", "title", "normalized_rating",
+                                            "raw_rating", "sentiment",
+                                            "city", "type"]) -> pd.core.frame.DataFrame:
+    """
+    returns only the selected columns
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): dataframe to be filtered
+        column_list (List[str], optional): list of column names.
+                                            Defaults to ["id", "content", "date",
+                                            "language", "title", "normalized_rating",
+                                            "raw_rating", "sentiment", "city", "type"].
+
+    Returns:
+        pd.core.frame.DataFrame: filtered dataframe
+    """
+    filtered_dataset = rating_df[column_list]
+    return filtered_dataset
+
