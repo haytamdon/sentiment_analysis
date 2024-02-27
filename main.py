@@ -14,6 +14,7 @@ from cleaning.data_cleaning import (fix_datetime_column,
                                     reformat_sentiment_col,
                                     filter_columns,
                                     compute_sentiment_col)
+from cleaning.text_processing import (separate_text_by_language)
 
 location_name_to_city = {
     # Mapper of some common locations with their cities
@@ -39,6 +40,7 @@ if __name__ == "__main__":
     json_file = open("mappings.json_(DS_A-L2).json")
     mapping_data = json.load(json_file)
     
+    # Data Cleaning
     # Reformatting columns
     rating_data = fix_datetime_column(rating_data, 
                                     "date")
@@ -81,3 +83,7 @@ if __name__ == "__main__":
     # computing sentiments
     correct_sentiment_data = compute_sentiment_col(filter_rating_data)
     main_rating_data = correct_sentiment_data.drop("raw_rating", axis=1)
+    
+    # Text Processing
+    # Fixing Languages
+    correct_language_rating_data = separate_text_by_language(main_rating_data)
