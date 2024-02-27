@@ -90,3 +90,22 @@ def get_tag_and_sentiment(rating_df: pd.core.frame.DataFrame,
     rating_df["sentiment"] = rating_df[col_name].apply(lambda x: [element['sentiment'] for element in x])
     rating_df[col_name] = rating_df[col_name].apply(lambda x: [element['value'] for element in x])
     return rating_df
+
+def map_tags(rating_df: pd.core.frame.DataFrame,
+                mapping_json: dict,
+                col_name: str) -> pd.core.frame.DataFrame:
+    """
+    maps tags ids to their appropriate values
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): dataframe containing the reviews
+        mapping_json (dict): a mapping dict/json containing the ids with their
+                            associated values
+        col_name (str): name of the tags column
+
+    Returns:
+        pd.core.frame.DataFrame: mapped dataframe
+    """
+    mappers = mapping_json['tags_mapping']
+    rating_df['transformed_tags'] = rating_df[col_name].apply(lambda x: [mappers[element] for element in x])
+    return rating_df
