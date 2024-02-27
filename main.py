@@ -2,7 +2,15 @@ import pandas as pd
 import json
 from cleaning.data_cleaning import (fix_datetime_column,
                                     fix_type_column,
-                                    remove_empty_rows)
+                                    remove_empty_rows,
+                                    fix_incorrect_cities,
+                                    get_city,
+                                    get_incorrect_cities,
+                                    get_location_type,
+                                    get_tag_and_sentiment,
+                                    map_tags,
+                                    split_ratings,
+                                    reformat_city_column)
 
 location_name_to_city = {
     # Mapper of some common locations with their cities
@@ -34,3 +42,21 @@ if __name__ == "__main__":
     filtered_rating_data = remove_empty_rows(rating_data, "ratings")
     filtered_rating_data = fix_type_column(filtered_rating_data, "ratings")
     
+    # Splitting Mixed columns
+    transformed_rating_data = split_ratings(filtered_rating_data, "ratings")
+    transformed_rating_data = get_tag_and_sentiment(transformed_rating_data, "tags")
+    
+    # Mapping tag ids to their values
+    mapped_rating_data = map_tags(transformed_rating_data,
+                                mapping_data,
+                                "tags")
+    
+    # Getting Locations
+    detailed_rating_data = get_city(mapped_rating_data, "transformed_tags")
+    detailed_rating_data = get_location_type(detailed_rating_data, "transformed_tags")
+    
+    # Reformating Cities Column
+    reformated_df = reformat_city_column(detailed_rating_data, 'city')
+    # Fixing Wrong Cities
+    incorrect_cities = get_incorrect_cities(reformated_df)
+    fixed_cities_rating_data = fix_incorrect_cities(reformated_df, incorrect_cities, location_name_to_city)
