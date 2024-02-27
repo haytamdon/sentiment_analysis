@@ -1,7 +1,8 @@
 import pandas as pd
 import datetime
 import ast
-from typing import List
+from typing import List, Dict
+from collections import Counter
 
 def fix_datetime_column(rating_df: pd.core.frame.DataFrame,
                         data_col_name: str) -> pd.core.frame.DataFrame:
@@ -181,4 +182,84 @@ def reformat_city_column(rating_df: pd.core.frame.DataFrame,
         pd.core.frame.DataFrame: formatted dataframe
     """
     rating_df[col_name] = rating_df[col_name].apply(lambda x: reformat_city(x))
+    return rating_df
+
+def get_incorrect_cities(rating_df: pd.core.frame.DataFrame) -> List[int]:
+    """
+    Get the indices of the rows that have a city value that
+    is a mixed list
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): base df
+
+    Returns:
+        List[int]: list of the incorrect indices
+    """
+    all_cities = rating_df['city'].values
+    problem_cities_indices = []
+    for i in range(len(all_cities)):
+        if type(all_cities[i])==list:
+            problem_cities_indices.append(i)
+    return problem_cities_indices
+
+def is_substring_in_list(substrings: List[str],
+                        target_string: str):
+    """
+    returns if an element in the list is a substring
+    of an input string if there is no substring returns
+    false
+
+    Args:
+        substrings (List[str]): list of all the potential
+                                substrings
+        target_string (str): the input string
+    """
+    for substring in substrings:
+        if substring in target_string:
+            return substring
+    return False # If there is no substring returns False
+
+def get_most_common_element(lst: List[str]):
+    """
+    Get the most common element in a list
+    if there isn't returns None
+
+    Args:
+        lst (List[str]): list to be checked
+    """
+    if not lst:
+        return None
+    counts = Counter(lst)
+    max_count = max(counts.values())
+    most_common = [k for k, v in counts.items() if v == max_count]
+    if len(most_common) == 1:
+        return most_common[0]
+    else:
+        return None
+
+def fix_incorrect_cities(rating_df: pd.core.frame.DataFrame,
+                        problem_cities_indices: List[int],
+                        location_name_to_city: Dict[str, str]):
+    """
+    Attribute to each location its appropriate city
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): dataframe to be adjusted
+        problem_cities_indices (List[int]): indices of bad cities
+        location_name_to_city (Dict[str]): mapping dictionary
+
+    Returns:
+        pd.core.frame.DataFrame: correctly labeled cities
+    """
+    for index in problem_cities_indices:
+        if is_substring_in_list(rating_df['city'].values[index],
+                                rating_df['title'].values[index]):
+            rating_df['city'].values[index] = is_substring_in_list(rating_df['city'].values[index],
+                                rating_df['title'].values[index])
+        elif len(rating_df['city'].values[index])>2 and get_most_common_element(rating_df['city'].values[index]):
+            rating_df['city'].values[index] = get_most_common_element(rating_df['city'].values[index])
+        elif rating_df['title'].values[index] in list(location_name_to_city.keys()):
+            rating_df['city'].values[index] = location_name_to_city[rating_df['title'].values[index]]
+        else:
+            continue
     return rating_df
