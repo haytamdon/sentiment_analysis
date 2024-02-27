@@ -1,6 +1,7 @@
 import pandas as pd
 import datetime
 import ast
+from typing import List
 
 def fix_datetime_column(rating_df: pd.core.frame.DataFrame,
                         data_col_name: str) -> pd.core.frame.DataFrame:
@@ -146,3 +147,38 @@ def get_location_type(rating_df: pd.core.frame.DataFrame,
     rating_df["type"] = rating_df[col_name].apply(lambda x: [li[0] for li in x])
     return rating_df
 
+def reformat_city(name_list: List[str]):
+    """
+    reformating the city name lists
+
+    Args:
+        name_list (List[str]): list of the city names
+
+    Returns:
+        List[str]: the fomatted names
+    """
+    if len(name_list)==1:
+        # if the list is composed of only 1 city we
+        # return that city
+        return name_list[0]
+    elif name_list == [name_list[0]]*len(name_list):
+        # if the list is repetitive of only one element
+        # we return that city
+        return name_list[0]
+    else:
+        return name_list
+
+def reformat_city_column(rating_df: pd.core.frame.DataFrame,
+                        col_name: str) -> pd.core.frame.DataFrame:
+    """
+    reformating the city column
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): dataframe of the cities
+        col_name (str): name of the cities column
+
+    Returns:
+        pd.core.frame.DataFrame: formatted dataframe
+    """
+    rating_df[col_name] = rating_df[col_name].apply(lambda x: reformat_city(x))
+    return rating_df
