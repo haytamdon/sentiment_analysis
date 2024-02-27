@@ -188,3 +188,62 @@ def preprocess_english_text(df: pd.core.frame.DataFrame,
     english_df['content'] = english_df['content'].apply(lambda x: remove_eng_stop_words(x, eng_stop_words))
     english_df = english_df.reset_index(drop = True)
     return english_df
+
+def get_punctuations():
+    punctuations = '''`÷×؛<>_()*&^%][ـ،/:"؟.,'{}~¦+|!”…“–ـ''' + string.punctuation
+    return punctuations
+
+def get_ara_stopwords():
+    arab_stop_words = stopwords.words('arabic')
+    return arab_stop_words
+
+def preprocess(text: str,
+                punctuations: str,
+                arab_stop_words: List[str]):
+    """
+    text is an arabic string input
+
+    remove punctuations and arabic stop words
+
+    Args:
+        text (str): the input text
+        punctuations (str): a string containing all
+                            the standard punctuations
+        arab_stop_words (List[str]): list of all the
+                                    arabic stop words
+
+    Returns:
+        _type_: _description_
+    """
+    translator = str.maketrans('', '', punctuations)
+    text = text.translate(translator)
+
+    text = re.sub("[إأآا]", "ا", text)
+    text = re.sub("ى", "ي", text)
+    text = re.sub("ؤ", "ء", text)
+    text = re.sub("ئ", "ء", text)
+    text = re.sub("ة", "ه", text)
+    text = re.sub("گ", "ك", text)
+
+    text = ' '.join(word for word in text.split() if word not in arab_stop_words)
+
+    return text
+
+def arabic_cleaning(data):
+    data['content'] = data['content'].str.replace('[^\u0621-\u064A\u0660-\u0669 ]', '', regex=True)
+    # We remove the arabic digits
+    data['content'] = data['content'].str.replace('/[\u0660-\u0669]/', '', regex=True)
+    # Keeps only the reviews with arabic letters
+    data = data[data['content'].str.contains('^[\u0621-\u064A\u0660-\u0669]')]
+    return data
+
+def preprocess_arabic_text(df,
+                        punctuations,
+                        arab_stop_words):
+    arabic_df = get_data_per_language(df, language="ara")
+    arabic_df["content"] = arabic_df["content"].apply(lambda x: preprocess(x,
+                                                                            punctuations,
+                                                                            arab_stop_words))
+    arabic_df = arabic_cleaning(arabic_df)
+    arabic_df = arabic_df.reset_index(drop=True)
+    return arabic_df
