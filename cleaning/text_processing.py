@@ -1,4 +1,6 @@
 import pandas as pd
+import re
+import string
 
 def get_data_per_language(df: pd.core.frame.DataFrame,
                         language: str) -> pd.core.frame.DataFrame:
@@ -61,4 +63,50 @@ def separate_text_by_language(df: pd.core.frame.DataFrame)-> pd.core.frame.DataF
             df = df._append(row_dict, ignore_index = True)
     # We reset the index for smoother manipulations
     df = df.reset_index(drop = True)
+    return df
+
+def deEmojify(text: str):
+    regrex_pattern = re.compile(pattern = "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        u"\U00002700-\U000027BF"  # Dingbats
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        "]+", flags = re.UNICODE)
+    return regrex_pattern.sub(r'',text)
+
+def text_preprocessing(text: str) -> str:
+    """
+    Make text lowercase, remove text in square brackets,remove links,remove punctuation
+    and remove words containing numbers.
+
+    Args:
+        text (str): _description_
+
+    Returns:
+        str: _description_
+    """
+    text = text.lower() # We transform the text to lowercase
+    text = re.sub('\[.*?\]', '', text)
+    text = re.sub('<.*?>+', '', text)
+    text = re.sub('[%s]' % re.escape(string.punctuation), '', text) # Remove Punctuations
+    text = re.sub('\n', '', text) # We remove the return to line
+    text = re.sub('\w*\d\w*', '', text) # Remove digits and words containing digits
+    return text
+
+def reduce_repeated_letters(text):
+    # Define the pattern to match any letter repeated 3 or more times
+    pattern = re.compile(r'(\w)\1{2,}')
+
+    # Use the sub() function to replace occurrences of the pattern with just one letter
+    result = pattern.sub(r'\1', text)
+
+    return result
+
+def preprocess_all_text(df: pd.core.frame.DataFrame) -> pd.core.frame.DataFrame:
+    df["content"] = df["content"].apply(lambda x: deEmojify(x))
+    df["content"] = df["content"].apply(lambda x: text_preprocessing(x))
+    df["content"] = df["content"].apply(lambda x: reduce_repeated_letters(x))
     return df
