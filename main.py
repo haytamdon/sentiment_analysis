@@ -10,7 +10,9 @@ from cleaning.data_cleaning import (fix_datetime_column,
                                     get_tag_and_sentiment,
                                     map_tags,
                                     split_ratings,
-                                    reformat_city_column)
+                                    reformat_city_column,
+                                    reformat_sentiment_col,
+                                    filter_columns)
 
 location_name_to_city = {
     # Mapper of some common locations with their cities
@@ -37,14 +39,20 @@ if __name__ == "__main__":
     mapping_data = json.load(json_file)
     
     # Reformatting columns
-    rating_data = fix_datetime_column(rating_data, "date")
-    rating_data = fix_type_column(rating_data, "tags")
-    filtered_rating_data = remove_empty_rows(rating_data, "ratings")
-    filtered_rating_data = fix_type_column(filtered_rating_data, "ratings")
+    rating_data = fix_datetime_column(rating_data, 
+                                    "date")
+    rating_data = fix_type_column(rating_data, 
+                                "tags")
+    filtered_rating_data = remove_empty_rows(rating_data, 
+                                            "ratings")
+    filtered_rating_data = fix_type_column(filtered_rating_data, 
+                                            "ratings")
     
     # Splitting Mixed columns
-    transformed_rating_data = split_ratings(filtered_rating_data, "ratings")
-    transformed_rating_data = get_tag_and_sentiment(transformed_rating_data, "tags")
+    transformed_rating_data = split_ratings(filtered_rating_data, 
+                                            "ratings")
+    transformed_rating_data = get_tag_and_sentiment(transformed_rating_data, 
+                                                    "tags")
     
     # Mapping tag ids to their values
     mapped_rating_data = map_tags(transformed_rating_data,
@@ -52,11 +60,19 @@ if __name__ == "__main__":
                                 "tags")
     
     # Getting Locations
-    detailed_rating_data = get_city(mapped_rating_data, "transformed_tags")
-    detailed_rating_data = get_location_type(detailed_rating_data, "transformed_tags")
+    detailed_rating_data = get_city(mapped_rating_data, 
+                                    "transformed_tags")
+    detailed_rating_data = get_location_type(detailed_rating_data, 
+                                            "transformed_tags")
     
     # Reformating Cities Column
     reformated_df = reformat_city_column(detailed_rating_data, 'city')
     # Fixing Wrong Cities
     incorrect_cities = get_incorrect_cities(reformated_df)
-    fixed_cities_rating_data = fix_incorrect_cities(reformated_df, incorrect_cities, location_name_to_city)
+    fixed_cities_rating_data = fix_incorrect_cities(reformated_df, 
+                                                    incorrect_cities, 
+                                                    location_name_to_city)
+    
+    # Formatting and filtering the columns
+    formatted_rating_data = reformat_sentiment_col(fixed_cities_rating_data)
+    filter_rating_data = filter_columns(formatted_rating_data)
