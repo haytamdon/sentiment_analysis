@@ -109,3 +109,40 @@ def map_tags(rating_df: pd.core.frame.DataFrame,
     mappers = mapping_json['tags_mapping']
     rating_df['transformed_tags'] = rating_df[col_name].apply(lambda x: [mappers[element] for element in x])
     return rating_df
+
+def get_city(rating_df: pd.core.frame.DataFrame,
+                col_name: str) -> pd.core.frame.DataFrame:
+    """
+    get the city value from the mapped tags
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): dataframe to be transformed
+        col_name (str): name of the tags column
+
+    Returns:
+        pd.core.frame.DataFrame: transformed dataframe
+    """
+    # the tags column is composed of nested lists
+    # the city value is the second element of each
+    # of these lists
+    rating_df["city"] = rating_df[col_name].apply(lambda x: [li[1] for li in x])
+    return rating_df
+
+def get_location_type(rating_df: pd.core.frame.DataFrame,
+                col_name: str) -> pd.core.frame.DataFrame:
+    """
+    get the location type from the mapped tags
+
+    Args:
+        rating_df (pd.core.frame.DataFrame): dataframe to be transformed
+        col_name (str): name of the tags column
+
+    Returns:
+        pd.core.frame.DataFrame: transformed dataframe
+    """
+    # the tags column is composed of nested lists
+    # the location type is the first element of each
+    # of these lists
+    rating_df["type"] = rating_df[col_name].apply(lambda x: [li[0] for li in x])
+    return rating_df
+
