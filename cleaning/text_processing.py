@@ -1,6 +1,8 @@
 import pandas as pd
 import re
 import string
+import nltk
+from nltk.corpus import stopwords
 
 def get_data_per_language(df: pd.core.frame.DataFrame,
                         language: str) -> pd.core.frame.DataFrame:
@@ -110,3 +112,17 @@ def preprocess_all_text(df: pd.core.frame.DataFrame) -> pd.core.frame.DataFrame:
     df["content"] = df["content"].apply(lambda x: text_preprocessing(x))
     df["content"] = df["content"].apply(lambda x: reduce_repeated_letters(x))
     return df
+
+def get_eng_stopwords():
+    nltk.download('stopwords')
+    eng_stop_words = stopwords.words('english')
+    return eng_stop_words
+
+def get_contractions(contractions_dict):
+    # Regular expression for finding contractions
+    contractions_re=re.compile('(%s)' % '|'.join(contractions_dict.keys()))
+    return contractions_re
+
+def get_eng_letters():
+    eng_letters = list(string.ascii_lowercase)
+    return eng_letters
