@@ -339,3 +339,18 @@ def compute_sentiment_col(rating_df: pd.core.frame.DataFrame,
     # not all reviews have the same scale
     rating_df[col_name] = rating_df["normalized_rating"].apply(lambda x: compute_sentiment(x))
     return rating_df
+
+def sentiment_encoder(df: pd.core.frame.DataFrame, 
+                    label_enc: dict):
+    df["class"] = df["sentiment"].apply(lambda x: label_enc[x])
+    return df
+
+def filter_data(df: pd.core.frame.DataFrame, 
+                column_lst: list = ["content", "class"]):
+    final_data = df[column_lst]
+    return final_data
+
+def col_rename(df: pd.core.frame.DataFrame, 
+                rename_col_dict: dict = {"content": "text", "class": "label"}):
+    df = df.rename(rename_col_dict, axis=1)
+    return df

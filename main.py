@@ -42,6 +42,13 @@ location_name_to_city = {
     "Boudl Gaber Hotel": "Riyadh"
 }
 
+# Label encoding dict
+label_enc = {
+    "negative": 2,
+    "neutral": 1,
+    "positive": 0
+}
+
 if __name__ == "__main__":
     # Reading the data
     rating_data = pd.read_csv("dataset.csv_(DS_A-L2).csv")
