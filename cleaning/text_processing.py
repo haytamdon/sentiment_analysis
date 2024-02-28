@@ -124,10 +124,6 @@ def get_contractions(contractions_dict):
     contractions_re=re.compile('(%s)' % '|'.join(contractions_dict.keys()))
     return contractions_re
 
-def get_eng_letters():
-    eng_letters = list(string.ascii_lowercase)
-    return eng_letters
-
 def get_contractions_dict():
     # Dictionary of English Contractions
     contractions_dict = { "ain't": "are not","'s":" is","aren't": "are not",
@@ -182,9 +178,10 @@ def remove_eng_stop_words(text, eng_stop_words):
     return text
 
 def preprocess_english_text(df: pd.core.frame.DataFrame,
-                            eng_stop_words: List[str]):
+                            eng_stop_words: List[str],
+                            contractions_re):
     english_df = get_data_per_language(df, language="eng")
-    english_df['content'] = english_df['content'].apply(lambda x: expand_contractions(x))
+    english_df['content'] = english_df['content'].apply(lambda x: expand_contractions(x, contractions_re))
     english_df['content'] = english_df['content'].apply(lambda x: remove_eng_stop_words(x, eng_stop_words))
     english_df = english_df.reset_index(drop = True)
     return english_df
