@@ -115,4 +115,5 @@ if __name__ == "__main__":
                                                     contractions_re)
     
     # Concat all data
-    full_processed_data = pd.concat([arabic_processed_data, english_processed_data]).reset_index(drop=True)
+    full_processed_data = pd.concat([arabic_processed_data, 
+                                    english_processed_data]).reset_index(drop=True)
