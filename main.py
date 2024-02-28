@@ -13,7 +13,10 @@ from cleaning.data_cleaning import (fix_datetime_column,
                                     reformat_city_column,
                                     reformat_sentiment_col,
                                     filter_columns,
-                                    compute_sentiment_col)
+                                    compute_sentiment_col,
+                                    sentiment_encoder,
+                                    filter_data,
+                                    col_rename)
 from cleaning.text_processing import (get_contractions, 
                                         separate_text_by_language,
                                         preprocess_all_text,
@@ -124,3 +127,12 @@ if __name__ == "__main__":
     # Concat all data
     full_processed_data = pd.concat([arabic_processed_data, 
                                     english_processed_data]).reset_index(drop=True)
+    
+    # Create a class column
+    full_processed_data = sentiment_encoder(full_processed_data, label_enc)
+    # Isolate only the wanted columns
+    final_data = filter_data(full_processed_data)
+    # Rename columns to conventional names
+    final_data = col_rename(final_data)
+    
+    
